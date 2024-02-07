@@ -13,12 +13,30 @@ import java.util.List;
 public class BoardRepository {
     private final EntityManager em;
 
+    @Transactional
+    public void update(BoardRequest.UpdateDTO requestDTO, int id) {
+        Query query = em.createNativeQuery("update board_tb set title = ?, content = ? where id = ?");
+        query.setParameter(1, requestDTO.getTitle());
+        query.setParameter(2, requestDTO.getContent());
+        query.setParameter(3, id);
+
+        query.executeUpdate();
+    }
+
     public List<Board> findAll(){
         Query query = em.createNativeQuery("select * from board_tb order by id desc", Board.class);
         return query.getResultList();
     }
 
-public BoardResponse.DetailDTO findById(int idx) {
+    public Board findById(int id) {
+        Query query = em.createNativeQuery("select * from board_tb where id = ?", Board.class);
+        query.setParameter(1, id);
+
+        Board board = (Board) query.getSingleResult();
+        return board;
+    }
+
+public BoardResponse.DetailDTO findByIdWithUser(int idx) {
     Query query = em.createNativeQuery("select b.id, b.title, b.content, b.user_id, u.username from board_tb b inner join user_tb u on b.user_id = u.id where b.id = ?");
     query.setParameter(1, idx);
 
@@ -55,5 +73,12 @@ public BoardResponse.DetailDTO findById(int idx) {
 
         query.executeUpdate();
 
+    }
+
+    @Transactional
+    public void deleteById(int id) {
+        Query query = em.createNativeQuery("delete from board_tb where id = ?");
+        query.setParameter(1, id);
+        query.executeUpdate();
     }
 }
