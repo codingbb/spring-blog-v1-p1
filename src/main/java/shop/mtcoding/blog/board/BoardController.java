@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog.user.User;
+import shop.mtcoding.blog.user.UserRequest;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public class BoardController {
 
     private final HttpSession session;
     private final BoardRepository boardRepository;
+
+
 
     @PostMapping("/board/{id}/update")
     public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO) {

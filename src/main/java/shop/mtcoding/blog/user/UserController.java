@@ -63,6 +63,25 @@ public String login(UserRequest.LoginDTO requestDTO){
         return "user/updateForm";
     }
 
+    @PostMapping("/user/update")
+    public String userUpdate(UserRequest.UpdateDTO requestDTO, HttpServletRequest request) {
+        //인증 체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+//        if (sessionUser == null) {
+//            return "redirect:/loginForm";
+//        }
+
+        //모델 위임
+        User user = userRepository.findByUsername(sessionUser.getUsername());
+        userRepository.savePassword(requestDTO, sessionUser.getUsername());
+
+        // 가방에 담기
+        request.setAttribute("sessionUser", user);
+        session.invalidate();
+
+        return "redirect:/loginForm";
+    }
+
     @GetMapping("/logout")
     public String logout() {
     session.invalidate();

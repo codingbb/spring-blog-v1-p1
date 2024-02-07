@@ -37,4 +37,22 @@ public User findByUsernameAndPassword(UserRequest.LoginDTO requestDTO) {
     User user = (User) query.getSingleResult();
     return user;
 }
+
+    public User findByUsername(String username) {
+        Query query = em.createNativeQuery("select * from user_tb where username=?", User.class);
+        query.setParameter(1, username);
+
+        User user = (User) query.getSingleResult();
+        return user;
+    }
+
+    @Transactional
+    public void savePassword(UserRequest.UpdateDTO requestDTO, String username) {
+        Query query = em.createNativeQuery("update user_tb set password = ? where username= ?");
+        query.setParameter(1, requestDTO.getPassword());
+        query.setParameter(2, username);
+
+        query.executeUpdate();
+    }
+
 }
