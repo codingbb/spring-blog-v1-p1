@@ -3,8 +3,10 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import shop.mtcoding.blog._core.config.security.MyLoginUser;
 import shop.mtcoding.blog.user.User;
 import shop.mtcoding.blog.user.UserRequest;
 
@@ -23,9 +25,6 @@ public class BoardController {
     public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO) {
         // 1. 인증 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
 
         // 2. 권한 체크
         Board board = boardRepository.findById(id);
@@ -45,9 +44,6 @@ public class BoardController {
     public String updateForm(@PathVariable int id, HttpServletRequest request) {
         // 인증 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
 
         // 권한 체크 (로그인한 유저의 아이디와 작성자 아이디 비교)
         // 조회 없이 권한 체크를 못한다. 게시글 누가 썼는지 모르잖아. 그래서 조회 먼저
@@ -67,9 +63,6 @@ public class BoardController {
     public String delete(@PathVariable int id, HttpServletRequest request) {
         // 1. 인증 안되면 나가
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) {  //401
-            return "redirect:/loginForm";
-        }
 
         // 2. 권한 없으면 나가
         Board board = boardRepository.findById(id);
@@ -88,9 +81,6 @@ public class BoardController {
     public String save(BoardRequest.SaveDTO requestDTO, HttpServletRequest request) {
         // 1. 인증 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
 
         // 2. 바디 데이터 확인 및 유효성 검사
         System.out.println(requestDTO);
@@ -108,9 +98,9 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping({"/", "/board"})
-    public String index(HttpServletRequest request) {
-
+    @GetMapping("/")
+    public String index(HttpServletRequest request, @AuthenticationPrincipal MyLoginUser myLoginUser) {
+        System.out.println("로그인 되었나? : " + myLoginUser.getUsername());
         List<Board> boardList = boardRepository.findAll();
         request.setAttribute("boardList", boardList);
 
@@ -125,9 +115,6 @@ public class BoardController {
 
         // 값이 null이면 로그인 페이지로 리다이렉션
         // 값이 null이 아니면 /board/saveForm 으로 이동
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
 
         return "board/saveForm";
     }
