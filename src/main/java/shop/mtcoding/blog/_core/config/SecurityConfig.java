@@ -6,18 +6,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+
 
 @Configuration  //컴퍼넌트 스캔
 public class SecurityConfig {
 
     @Bean
     public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); //IoC 등록, 시큐리티가 로그인할때 어떤 해시로 비교해야하는지 알게됨
     }
 
     @Bean
-    public WebSecurityCustomizer ignore() {
-        return w -> w.ignoring().requestMatchers("/board/*", "/static/**", "/h2-console/**");
+    public WebSecurityCustomizer ignore() { //정적 자원만 security filter에서 제외하는 것!
+        return w -> w.ignoring().requestMatchers("/static/**", "/h2-console/**");
     }
 
     @Bean
@@ -26,10 +28,12 @@ public class SecurityConfig {
         http.csrf(c -> c.disable());
 
         http.authorizeHttpRequests(a -> {
-            //이 페이지는 인증이 필요해! 인증 없으면 못 들어감!
-            a.requestMatchers("/user/updateForm", "/board/**").authenticated()
+
+            a.requestMatchers(RegexRequestMatcher.regexMatcher("/board/\\d+")).permitAll()
+                    .requestMatchers("/user/**", "/board/**").authenticated()
                     .anyRequest().permitAll();
         });
+
 
         http.formLogin(f -> {
             f.loginPage("/loginForm").loginProcessingUrl("/login").defaultSuccessUrl("/").failureUrl("/loginForm");
