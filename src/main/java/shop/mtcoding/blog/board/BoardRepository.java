@@ -36,6 +36,7 @@ public class BoardRepository {
         return board;
     }
 
+    // 수정하기!!
 public BoardResponse.DetailDTO findByIdWithUser(int idx) {
     Query query = em.createNativeQuery("select b.id, b.title, b.content, b.user_id, u.username from board_tb b inner join user_tb u on b.user_id = u.id where b.id = ?");
     query.setParameter(1, idx);
@@ -45,7 +46,7 @@ public BoardResponse.DetailDTO findByIdWithUser(int idx) {
     Integer id = (Integer) row[0];
     String title = (String) row[1];
     String content = (String) row[2];
-    int userId = (Integer) row[3];
+    Integer userId = (Integer) row[3];
     String username = (String) row[4];
 
     System.out.println("id : "+id);
@@ -63,6 +64,40 @@ public BoardResponse.DetailDTO findByIdWithUser(int idx) {
 
     return responseDTO;
 }
+
+    public BoardResponse.DetailDTO findByIdWithUserV2(int idx) {
+        Query query = em.createNativeQuery("select \n" +
+                "bt.id, bt.title, bt.content, bt.user_id, but.username, \n" +
+                "bt.created_at, rt.id r_id, rt.user_id r_user_id, rut.username, rt.comment \n" +
+                "from board_tb bt \n" +
+                "left outer join reply_tb rt on bt.id = rt.board_id \n" +
+                "inner join user_tb but on bt.user_id = but.id \n" +
+                "left outer join user_tb rut on rt.user_id = rut.id where bt.id = ?;");
+        query.setParameter(1, idx);
+
+        Object[] row = (Object[]) query.getSingleResult();
+
+        Integer id = (Integer) row[0];
+        String title = (String) row[1];
+        String content = (String) row[2];
+        Integer userId = (Integer) row[3];
+        String username = (String) row[4];
+
+        System.out.println("id : "+id);
+        System.out.println("title : "+title);
+        System.out.println("content : "+content);
+        System.out.println("userId : "+userId);
+        System.out.println("username : "+username);
+
+        BoardResponse.DetailDTO responseDTO = new BoardResponse.DetailDTO();
+        responseDTO.setId(id);
+        responseDTO.setTitle(title);
+        responseDTO.setContent(content);
+        responseDTO.setUserId(userId);
+        responseDTO.setUsername(username);
+
+        return responseDTO;
+    }
 
 @Transactional
     public void save(BoardRequest.SaveDTO requestDTO, int userId) {
