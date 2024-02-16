@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 public class Reply {
     @Id // PK 설정
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 전략
-    private int id;
+    private Integer id;
 
     private String comment;
-    private int userId;
-    private int boardId;
+    private Integer userId;
+    private Integer boardId;
     private LocalDateTime createdAt;
 
 }
