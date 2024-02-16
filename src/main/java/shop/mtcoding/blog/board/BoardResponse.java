@@ -16,13 +16,6 @@ public class BoardResponse {
         private String content;
         private Integer userId;
         private String username;
-        private Timestamp createdAt;
-
-        // Reply
-        private Integer rId;
-        private Integer rUserId;
-        private Integer rUsername;
-        private String rComment;
 
     }
 
