@@ -1,5 +1,7 @@
 # 스프링부트 블로그 만들기
 
+ExceptionHandler 브랜치에 bcrypt도 있다
+
 ## 기술스택
 
 - Springboot 2.7
