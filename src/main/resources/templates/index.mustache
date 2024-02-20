@@ -1,12 +1,12 @@
 {{> /layout/header}}
 
-<h1>
-    {{#sessionUser}}
-        {{username}}
-    {{/sessionUser}}
-</h1>
-
 <div class="container p-5">
+    <div class="d-flex justify-content-end mb-3">
+        <form class="d-flex mb-2" action="/" method="get">
+            <input class="form-control me-2" type="text" name="keyword" placeholder="Search" required>
+            <button class="btn btn-primary">검색</button>
+        </form>
+    </div>
 
     {{#boardList}}
         <div class="card mb-3">
@@ -19,8 +19,8 @@
 
 
     <ul class="pagination d-flex justify-content-center">
-        <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prev}}">Previous</a></li>
-        <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{next}}">Next</a></li>
+        <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prev}}&keyword={{keyword}}">Previous</a></li>
+        <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{next}}&keyword={{keyword}}">Next</a></li>
     </ul>
 
 </div>
