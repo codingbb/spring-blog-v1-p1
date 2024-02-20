@@ -34,7 +34,12 @@ public User findByUsernameAndPassword(UserRequest.LoginDTO requestDTO) {
     query.setParameter(1, requestDTO.getUsername());
     query.setParameter(2, requestDTO.getPassword());
 
-    User user = (User) query.getSingleResult();
-    return user;
-}
+    try {
+        User user = (User) query.getSingleResult();
+        return user;
+    } catch (Exception e) { //NoResultException이 발생할 수 있기 때문
+        throw new RuntimeException("아이디 혹은 비밀번호를 찾을 수 없습니다");
+    }
+
+    }
 }
