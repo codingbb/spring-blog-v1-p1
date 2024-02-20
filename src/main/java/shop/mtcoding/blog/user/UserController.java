@@ -3,6 +3,7 @@ package shop.mtcoding.blog.user;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,10 +27,16 @@ public String login(UserRequest.LoginDTO requestDTO){
     System.out.println(requestDTO); // toString -> @Data
 
     if(requestDTO.getUsername().length() < 3){
-        return "error/400"; // ViewResolver 설정이 되어 있음. (앞 경로, 뒤 경로)
+        throw new RuntimeException("유저 네임 길이가 너무 짧아요");
     }
 
-    User user = userRepository.findByUsernameAndPassword(requestDTO);
+    User user = userRepository.findByUsername(requestDTO.getUsername());
+
+    //! = 패스워드 검증 실패 시
+    // id가 없는 것도 따로 날릴 수 있고, password가 안 맞는 것도 따로 날릴 수 있따
+    if (!BCrypt.checkpw(requestDTO.getPassword(), user.getPassword())) { //순수한 패스워드, db에 있는 유저 패스워드
+        throw new RuntimeException("패스워드가 틀렸습니다");  //원래는 'ID나 PASSWORD가 틀렸습니다' 라고만 뜨겠지
+    }
     session.setAttribute("sessionUser", user); // 락카에 담음 (StateFul)
 
     return "redirect:/"; // 컨트롤러가 존재하면 무조건 redirect 외우기
@@ -38,6 +45,11 @@ public String login(UserRequest.LoginDTO requestDTO){
     @PostMapping("/join")
     public String join(UserRequest.JoinDTO requestDTO){
         System.out.println(requestDTO);
+
+        String rawPassword = requestDTO.getPassword();
+        String encPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
+        //솔트 넣어야됨. 이제 비밀번호에 _jooho에 섞여서 들어감. 이래야 레인보우 테이블한테 안털림
+        requestDTO.setPassword(encPassword);
 
         //ssar을 조회해보고 있으면 회원가입 x, 없으면 회원가입 o
 
